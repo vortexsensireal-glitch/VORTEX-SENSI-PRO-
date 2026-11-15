@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ VORTEX SENSI ⚡</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#070707;color:#fff;
+ font-family:Arial,sans-serif;
+}
+header{
+ text-align:center;padding:23px 10px;
+ font-size:26px;font-weight:900;
+ color:#ff2929;text-shadow:0 0 15px red;
+}
+.container{width:92%;max-width:480px;margin:10px auto 35px}
+.page{display:none;animation:entrada .3s}
+.page.active{display:block}
+@keyframes entrada{
+ from{opacity:0;transform:translateY(12px)}
+ to{opacity:1;transform:translateY(0)}
+}
+.panel{
+ background:#111;border:1px solid #722222;
+ border-radius:17px;padding:20px;
+ box-shadow:0 0 20px #300000;
+}
+h2{text-align:center;color:#ff3838;font-size:21px}
+p{text-align:center;color:#aaa;font-size:14px}
+input{
+ width:100%;padding:15px;margin:10px 0;
+ background:#080808;border:1px solid #783333;
+ border-radius:10px;color:white;font-size:16px;
+ outline:none;
+}
+button{
+ width:100%;padding:15px;margin:7px 0;
+ background:#201111;border:1px solid #8d2929;
+ border-radius:10px;color:white;
+ font-size:14px;font-weight:bold;
+ cursor:pointer;
+}
+button:active{transform:scale(.98)}
+button.selected,.main{
+ background:#b90000;border-color:#ff5555;
+ box-shadow:0 0 12px #a90000;
+}
+.back{background:#292929;border-color:#555}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.grid button{margin:0}
+.list{max-height:260px;overflow:auto}
+.value{
+ display:flex;justify-content:space-between;
+ padding:13px;background:#211313;
+ border-radius:9px;margin:8px 0;
+}
+.value b{color:#ff5555}
+.progress{
+ height:10px;background:#333;
+ border-radius:20px;overflow:hidden;margin-top:20px;
+}
+.bar{height:100%;width:0;background:#ff2525;transition:width .1s}
+.orb{
+ width:85px;height:85px;margin:25px auto;
+ border:5px solid red;border-right-color:transparent;
+ border-radius:50%;animation:spin 1s linear infinite;
+ box-shadow:0 0 20px red;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.small{font-size:12px;color:#999}
+</style>
+</head>
+
+<body>
+<header>⚡ VORTEX SENSI ⚡</header>
+
+<div class="container">
+
+<!-- SENHA -->
+<section class="page active" id="login">
+ <div class="panel">
+  <h2>🔐 ACESSO VORTEX</h2>
+  <p>Digite sua senha para continuar</p>
+  <input id="password" type="password" placeholder="Digite sua senha">
+  <button class="main" onclick="login()">CONTINUAR</button>
+  <p id="error"></p>
+ </div>
+</section>
+
+<!-- SISTEMA -->
+<section class="page" id="p1">
+ <div class="panel">
+  <h2>ESCOLHA SEU DISPOSITIVO</h2>
+  <p>Selecione seu sistema</p>
+  <div class="grid">
+   <button onclick="selectSystem('Android')">🤖 ANDROID</button>
+   <button onclick="selectSystem('iPhone')">🍎 IPHONE</button>
+  </div>
+  <button class="back" onclick="show('login')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- MARCA -->
+<section class="page" id="p2">
+ <div class="panel">
+  <h2>ESCOLHA A MARCA</h2>
+  <p>Selecione a fabricante do celular</p>
+  <div id="brands" class="grid"></div>
+  <button class="back" onclick="show('p1')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- MODELO -->
+<section class="page" id="p3">
+ <div class="panel">
+  <h2>ESCOLHA O MODELO</h2>
+  <p>Pesquise o modelo do aparelho</p>
+  <input id="search" placeholder="Pesquisar modelo..." oninput="filterModels()">
+  <div id="models" class="list"></div>
+  <button class="back" onclick="show('p2')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- DPI -->
+<section class="page" id="p4">
+ <div class="panel">
+  <h2>CONFIGURAÇÃO DPI</h2>
+  <p>Escolha uma opção</p>
+  <div class="grid">
+   <button onclick="pick('dpi','Com DPI',this)">COM DPI</button>
+   <button onclick="pick('dpi','Sem DPI',this)">SEM DPI</button>
+  </div>
+  <button class="main" onclick="next(4,'dpi')">CONTINUAR</button>
+  <button class="back" onclick="show('p3')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- DEDOS -->
+<section class="page" id="p5">
+ <div class="panel">
+  <h2>QUANTIDADE DE DEDOS</h2>
+  <p>Quantos dedos você utiliza?</p>
+  <div class="grid">
+   <button onclick="pick('fingers','2 dedos',this)">2 DEDOS</button>
+   <button onclick="pick('fingers','3 dedos',this)">3 DEDOS</button>
+   <button onclick="pick('fingers','4 dedos',this)">4 DEDOS</button>
+   <button onclick="pick('fingers','5 dedos',this)">5 DEDOS</button>
+  </div>
+  <button class="main" onclick="next(5,'fingers')">CONTINUAR</button>
+  <button class="back" onclick="show('p4')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- BOTÃO -->
+<section class="page" id="p6">
+ <div class="panel">
+  <h2>TAMANHO DO BOTÃO DE TIRO</h2>
+  <div class="grid">
+   <button onclick="pick('fire','Pequeno',this)">PEQUENO</button>
+   <button onclick="pick('fire','Médio',this)">MÉDIO</button>
+   <button onclick="pick('fire','Grande',this)">GRANDE</button>
+  </div>
+  <button class="main" onclick="next(6,'fire')">CONTINUAR</button>
+  <button class="back" onclick="show('p5')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- SENSIBILIDADE -->
+<section class="page" id="p7">
+ <div class="panel">
+  <h2>ESCOLHA SUA SENSIBILIDADE</h2>
+  <p>Selecione a categoria desejada</p>
+  <button onclick="pick('level','Alta',this)">🔥 ALTA — 100 ATÉ 200</button>
+  <button onclick="pick('level','Média',this)">⚡ MÉDIA — 100 ATÉ 178</button>
+  <button onclick="pick('level','Baixa',this)">🎯 BAIXA — 0 ATÉ 150</button>
+  <button class="main" onclick="generate()">GERAR SENSIBILIDADE</button>
+  <button class="back" onclick="show('p6')">VOLTAR</button>
+ </div>
+</section>
+
+<!-- CALIBRAÇÃO -->
+<section class="page" id="loading">
+ <div class="panel">
+  <h2>CALIBRANDO SUA SENSI...</h2>
+  <div class="orb"></div>
+  <p id="loadingText">Preparando configuração...</p>
+  <div class="progress">
+   <div class="bar" id="bar"></div>
+  </div>
+ </div>
+</section>
+
+<!-- RESULTADO -->
+<section class="page" id="result">
+ <div class="panel">
+  <h2>✅ SENSIBILIDADE GERADA</h2>
+  <p id="device"></p>
+  <div id="values"></div>
+  <button class="main" onclick="copyResult()">📋 COPIAR CONFIGURAÇÃO</button>
+  <button onclick="restart()">🔄 GERAR OUTRA SENSI</button>
+ </div>
+</section>
+
+</div>
+
+<script>
+const data={
+ system:"",
+ brand:"",
+ model:"",
+ dpi:"",
+ fingers:"",
+ fire:"",
+ level:""
+};
+
+const database={
+ Android:{
+  Samsung:[
+   "Galaxy A05","Galaxy A05s","Galaxy A12","Galaxy A13",
+   "Galaxy A14","Galaxy A15","Galaxy A16","Galaxy A22",
+   "Galaxy A23","Galaxy A24","Galaxy A25","Galaxy A32",
+   "Galaxy A33","Galaxy A34","Galaxy A35","Galaxy A52",
+   "Galaxy A53","Galaxy A54","Galaxy A55","Galaxy S21",
+   "Galaxy S22","Galaxy S23","Galaxy S24"
+  ],
+  Motorola:[
+   "Moto E13","Moto E22","Moto E32","Moto G04",
+   "Moto G14","Moto G24","Moto G34","Moto G54",
+   "Moto G84","Edge 30","Edge 40","Edge 50"
+  ],
+  Xiaomi:[
+   "Redmi 9A","Redmi 10","Redmi 12","Redmi 13C",
+   "Redmi Note 10","Redmi Note 11","Redmi Note 12",
+   "Redmi Note 13","Poco C65","Poco X5","Poco X6"
+  ],
+  Realme:[
+   "Realme C11","Realme C21","Realme C25","Realme C30",
+   "Realme C33","Realme C35","Realme C51","Realme C53",
+   "Realme C55","Realme C61","Realme Note 50",
+   "Realme Note 60","Realme Note 60X"
+  ],
+  Infinix:[
+   "Smart 7","Smart 8","Hot 30","Hot 40",
+   "Hot 50","Note 30","Note 40"
+  ],
+  Tecno:[
+   "Spark 10","Spark 20","Spark 20C",
+   "Spark 30","Pova 5","Pova 6"
+  ],
+  Asus:[
+   "Zenfone 8","Zenfone 9","Zenfone 10",
+   "ROG Phone 6","ROG Phone 7"
+  ]
+ },
+ iPhone:{
+  Apple:[
+   "iPhone 7","iPhone 7 Plus","iPhone 8",
+   "iPhone 8 Plus","iPhone X","iPhone XR",
+   "iPhone XS","iPhone XS Max","iPhone 11",
+   "iPhone 11 Pro","iPhone 11 Pro Max",
+   "iPhone SE 2020","iPhone 12 mini","iPhone 12",
+   "iPhone 12 Pro","iPhone 12 Pro Max",
+   "iPhone 13 mini","iPhone 13","iPhone 13 Pro",
+   "iPhone 13 Pro Max","iPhone 14","iPhone 14 Plus",
+   "iPhone 14 Pro","iPhone 14 Pro Max","iPhone 15",
+   "iPhone 15 Plus","iPhone 15 Pro","iPhone 15 Pro Max",
+   "iPhone 16","iPhone 16 Plus","iPhone 16 Pro",
+   "iPhone 16 Pro Max","iPhone 17","iPhone 17 Pro",
+   "iPhone 17 Pro Max"
+  ]
+ }
+};
+
+let currentModels=[];
+
+function show(id){
+ document.querySelectorAll(".page").forEach(page=>{
+  page.classList.remove("active");
+ });
+ document.getElementById(id).classList.add("active");
+}
+
+function login(){
+ const password=document.getElementById("password").value.trim();
+
+ if(password==="vortexsensi"){
+  document.getElementById("error").textContent="";
+  show("p1");
+ }else{
+  document.getElementById("error").textContent="❌ Senha incorreta!";
+ }
+}
+
+document.getElementById("password").addEventListener("keydown",e=>{
+ if(e.key==="Enter") login();
+});
+
+function selectSystem(system){
+ data.system=system;
+ data.brand="";
+ data.model="";
+ renderBrands();
+ show("p2");
+}
+
+function renderBrands(){
+ const area=document.getElementById("brands");
+ area.innerHTML="";
+
+ Object.keys(database[data.system]).forEach(brand=>{
+  const btn=document.createElement("button");
+  btn.textContent=brand;
+  btn.onclick=()=>selectBrand(brand);
+  area.appendChild(btn);
+ });
+}
+
+function selectBrand(brand){
+ data.brand=brand;
+ currentModels=database[data.system][brand]||[];
+ document.getElementById("search").value="";
+ filterModels();
+ show("p3");
+}
+
+function filterModels(){
+ const query=document.getElementById("search").value.toLowerCase();
+ const area=document.getElementById("models");
+ area.innerHTML="";
+
+ const filtered=currentModels.filter(model=>
+  model.toLowerCase().includes(query)
+ );
+
+ if(filtered.length===0){
+  area.innerHTML="<p>Modelo não encontrado.</p>";
+  return;
+ }
+
+ filtered.forEach(model=>{
+  const btn=document.createElement("button");
+  btn.textContent=model;
+  btn.onclick=()=>{
+   data.model=model;
+   show("p4");
+  };
+  area.appendChild(btn);
+ });
+}
+
+function pick(key,value,button){
+ data[key]=value;
+
+ button.parentElement.querySelectorAll("button").forEach(b=>{
+  b.classList.remove("selected");
+ });
+
+ button.classList.add("selected");
+}
+
+function next(step,key){
+ if(!data[key]){
+  alert("Escolha uma opção para continuar.");
+  return;
+ }
+ show("p"+(step+1));
+}
+
+function generate(){
+ if(!data.level){
+  alert("Escolha alta, média ou baixa.");
+  return;
+ }
+
+ show("loading");
+
+ let progress=0;
+ const bar=document.getElementById("bar");
+ const label=document.getElementById("loadingText");
+ bar.style.width="0%";
+
+ const messages=[
+  "Analisando seu dispositivo...",
+  "Preparando configurações...",
+  "Ajustando valores...",
+  "Finalizando sua sensibilidade..."
+ ];
+
+ const timer=setInterval(()=>{
+  progress+=2;
+  bar.style.width=progress+"%";
+  label.textContent=messages[
+   Math.min(3,Math.floor(progress/26))
+  ];
+
+  if(progress>=100){
+   clearInterval(timer);
+   generateResult();
+  }
+ },50);
+}
+
+function generateResult(){
+ let minimo,maximo;
+
+ if(data.level==="Alta"){
+  minimo=100;
+  maximo=200;
+ }
+ else if(data.level==="Média"){
+  minimo=100;
+  maximo=178;
+ }
+ else{
+  minimo=0;
+  maximo=150;
+ }
+
+ const names=[
+  "Geral",
+  "Ponto vermelho",
+  "Mira 2x",
+  "Mira 4x",
+  "Mira AWM",
+  "Olhadinha"
+ ];
+
+ const values={};
+
+ names.forEach(name=>{
+  values[name]=Math.floor(
+   Math.random()*(maximo-minimo+1)
+  )+minimo;
+ });
+
+ document.getElementById("values").innerHTML=names.map(name=>`
+  <div class="value">
+   <span>${name}</span>
+   <b>${values[name]}</b>
+  </div>
+ `).join("");
+
+ document.getElementById("device").textContent=
+  data.system+" • "+data.brand+" • "+data.model+
+  " • "+data.level+" ("+minimo+" até "+maximo+")";
+
+ show("result");
+}
+
+function copyResult(){
+ const text=
+  "⚡ VORTEX SENSI ⚡\n"+
+  "Dispositivo: "+data.system+" "+data.brand+" "+data.model+"\n"+
+  "DPI: "+data.dpi+"\n"+
+  "Dedos: "+data.fingers+"\n"+
+  "Botão: "+data.fire+"\n"+
+  "Categoria: "+data.level+"\n\n"+
+  document.getElementById("values").innerText;
+
+ const area=document.createElement("textarea");
+ area.value=text;
+ document.body.appendChild(area);
+ area.select();
+
+ try{
+  document.execCommand("copy");
+  alert("Configuração copiada!");
+ }catch(e){
+  alert("Não foi possível copiar.");
+ }
+
+ area.remove();
+}
+
+function restart(){
+ Object.keys(data).forEach(key=>data[key]="");
+ document.getElementById("password").value="";
+ document.getElementById("error").textContent="";
+ document.getElementById("bar").style.width="0%";
+ document.getElementById("search").value="";
+ show("login");
+}
+</script>
+
+</body>
+  </html>
+  
